@@ -35,7 +35,13 @@ type database struct {
 }
 
 func (db *database) help(w http.ResponseWriter, req *http.Request) {
-	fmt.Fprintf(w, "input instruction\n")
+	fmt.Fprintf(w, "url input instruction\n")
+	fmt.Fprintf(w, "\"/list\" would list the item in the database\n")
+	fmt.Fprintf(w, "\"/price\" would give the price of selected item\n")
+	fmt.Fprintf(w, "\"/add\" would add a new item to database\n")
+	fmt.Fprintf(w, "\"/update\" would update the price of selected item\n")
+	fmt.Fprintf(w, "\"/delete\" would delete the selected item\n")
+	fmt.Fprintf(w, "example: curl \"http://localhost:8000/update?item=shoes&price=20\"\n")
 }
 
 func (db *database) list(w http.ResponseWriter, req *http.Request) {
