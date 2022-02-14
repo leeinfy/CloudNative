@@ -69,6 +69,7 @@ func (db *database) price(w http.ResponseWriter, req *http.Request) {
 func (db *database) add(w http.ResponseWriter, req *http.Request) {
 	item := req.URL.Query().Get("item")
 	db.lock.Lock() //write lock
+	defer db.lock.Unlock()
 	_, ok := db.dataMap[item]
 	if ok { //item is already existed
 		w.WriteHeader(http.StatusNotFound)
@@ -82,7 +83,6 @@ func (db *database) add(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 	db.dataMap[item] = dollars(price) //add the item to the list and assign a price
-	db.lock.Unlock()
 	fmt.Fprintf(w, "%q is successfully add to the list\n", item)
 }
 
@@ -90,6 +90,7 @@ func (db *database) add(w http.ResponseWriter, req *http.Request) {
 func (db *database) update(w http.ResponseWriter, req *http.Request) {
 	item := req.URL.Query().Get("item")
 	db.lock.Lock()
+	defer db.lock.Unlock()
 	_, ok := db.dataMap[item]
 	if !ok { //the item is not in the list
 		w.WriteHeader(http.StatusNotFound)
@@ -103,7 +104,6 @@ func (db *database) update(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 	db.dataMap[item] = dollars(price) //update the price of that item
-	db.lock.Unlock()
 	fmt.Fprintf(w, "price of %q is change to %s\n", item, dollars(price))
 }
 
@@ -111,6 +111,7 @@ func (db *database) update(w http.ResponseWriter, req *http.Request) {
 func (db *database) delete(w http.ResponseWriter, req *http.Request) {
 	item := req.URL.Query().Get("item")
 	db.lock.Lock()
+	defer db.lock.Unlock()
 	_, ok := db.dataMap[item]
 	if !ok { //the item is not in the list
 		w.WriteHeader(http.StatusNotFound)
@@ -118,6 +119,5 @@ func (db *database) delete(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 	delete(db.dataMap, item) //delete the item from the database
-	db.lock.Unlock()
 	fmt.Fprintf(w, "%q is successfully delete from the list\n", item)
 }
