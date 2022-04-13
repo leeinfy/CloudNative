@@ -1,0 +1,10 @@
+FROM golang:1.14-alpine AS build
+WORKDIR /src
+COPY . /src/
+RUN go mod download
+RUN CGO_ENABLE=0 go build -o /bin/webserverdb
+FROM alpine
+#FROM scratch
+#COPY grpcServer /bin/grpcServer
+COPY  --from=build /bin/webserverdb /bin/webserverdb
+ENTRYPOINT ["/bin/webserverdb"]
