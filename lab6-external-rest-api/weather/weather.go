@@ -13,20 +13,32 @@ import (
 type Temperature float64
 
 func (t Temperature) Fahrenheit() float64 {
-	return (float64(t) - 273.15)*(9.0/5.0) + 32.0
+	return (float64(t)-273.15)*(9.0/5.0) + 32.0
 }
 
+//"Conditions" struct contains the desire value
 type Conditions struct {
-	Summary     string
-	Temperature Temperature
+	weather     string
+	temperature Temperature
+	pressure    float64
+	humidity    float64
+	windSpeed   float64
+	windAngle   float64
 }
 
-type OWMResponse struct {
+//"OWMresponse" struct contains the desired data abstruct from json file
+type OWMResponse struct { //change the struct formation here to match needed value in jason
 	Weather []struct {
 		Main string
 	}
 	Main struct {
-		Temp Temperature
+		Temp     Temperature
+		Pressure float64
+		Humidity float64
+	}
+	Wind struct {
+		Speed float64
+		Angle float64 `json:"deg"`
 	}
 }
 
@@ -51,6 +63,7 @@ func (c Client) FormatURL(location string) string {
 	return fmt.Sprintf("%s/data/2.5/weather?q=%s&appid=%s", c.BaseURL, location, c.APIKey)
 }
 
+//get the http request and converted it into a "Conditions" stuct
 func (c *Client) GetWeather(location string) (Conditions, error) {
 	URL := c.FormatURL(location)
 	resp, err := c.HTTPClient.Get(URL)
@@ -75,6 +88,7 @@ func (c *Client) GetWeather(location string) (Conditions, error) {
 	return conditions, nil
 }
 
+//This is the where the converstion take place (Json format-> "Conditions")
 func ParseResponse(data []byte) (Conditions, error) {
 	var resp OWMResponse
 	err := json.Unmarshal(data, &resp)
@@ -85,12 +99,17 @@ func ParseResponse(data []byte) (Conditions, error) {
 		return Conditions{}, fmt.Errorf("invalid API response %s: require at least one weather element", data)
 	}
 	conditions := Conditions{
-		Summary:     resp.Weather[0].Main,
-		Temperature: resp.Main.Temp,
+		weather:     resp.Weather[0].Main,
+		temperature: resp.Main.Temp,
+		pressure:    resp.Main.Pressure,
+		humidity:    resp.Main.Humidity,
+		windSpeed:   resp.Wind.Speed,
+		windAngle:   resp.Wind.Angle,
 	}
 	return conditions, nil
 }
 
+//this function has not been used
 func FormatURL(baseURL, location, key string) string {
 	return fmt.Sprintf("%s/data/2.5/weather?q=%s&appid=%s", baseURL, location, key)
 }
@@ -106,7 +125,7 @@ func Get(location, key string) (Conditions, error) {
 
 func RunCLI() {
 	if len(os.Args) < 2 {
-		fmt.Fprintf(os.Stderr, "Usage: %s LOCATION\n\nExample: %[1]s London,UK", os.Args[0])
+		fmt.Fprintf(os.Stderr, "Usage: %s LOCATION\nExample: %[1]s London,UK\n", os.Args[0])
 		os.Exit(1)
 	}
 	location := os.Args[1]
@@ -120,6 +139,6 @@ func RunCLI() {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
-	fmt.Printf("%s %.1fº\n", conditions.Summary, conditions.Temperature.Fahrenheit())
-
+	fmt.Printf("Weather:%s Temperature:%.1fº Humidity:%.1f Pressure%.1f\n", conditions.weather, conditions.temperature.Fahrenheit(), conditions.humidity, conditions.pressure)
+	fmt.Printf("WindSpeed:%.1f WindAngle:%.1f\n", conditions.windSpeed, conditions.windAngle)
 }

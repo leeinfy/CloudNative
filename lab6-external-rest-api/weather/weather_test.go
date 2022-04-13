@@ -18,16 +18,23 @@ func TestParseResponse(t *testing.T) {
 		t.Fatal(err)
 	}
 	want := Conditions{
-		Summary:     "Clouds",
-		Temperature: 281.33,
+		weather:     "Clouds",
+		temperature: 281.33,
+		pressure:    1000,
+		humidity:    90,
+		windSpeed:   3.09,
+		windAngle:   240,
 	}
 	got, err := ParseResponse(data)
 	if err != nil {
 		t.Fatal(err)
 	}
-	if !cmp.Equal(want, got) {
-		t.Error(cmp.Diff(want, got))
+	if want != got {
+		t.Error("TestParseResponse Fail, got incorrect respond")
 	}
+	//if !cmp.Equal(want, got) { //this will give a panic
+	//	t.Error(cmp.Diff(want, got))
+	//}
 }
 
 func TestParseResponseEmpty(t *testing.T) {
@@ -106,16 +113,23 @@ func TestGetWeather(t *testing.T) {
 	c.BaseURL = ts.URL
 	c.HTTPClient = ts.Client()
 	want := Conditions{
-		Summary:     "Clouds",
-		Temperature: 281.33,
+		weather:     "Clouds",
+		temperature: 281.33,
+		pressure:    1000,
+		humidity:    90,
+		windSpeed:   3.09,
+		windAngle:   240,
 	}
 	got, err := c.GetWeather("Paris,FR")
 	if err != nil {
 		t.Fatal(err)
 	}
-	if !cmp.Equal(want, got) {
-		t.Error(cmp.Diff(want, got))
+	if want != got {
+		t.Error("TestGetWeather fail")
 	}
+	//if !cmp.Equal(want, got) {
+	//	t.Error(cmp.Diff(want, got))
+	//}
 }
 
 func TestFahrenheit(t *testing.T) {
