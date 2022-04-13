@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: lab8-web-deployment
+  labels:
+    app: lab8-web
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: lab8-web
+  template:
+    metadata:
+      labels:
+        app: lab8-web
+    spec:
+      containers:
+      - name: webserver-container
+        image: localhost:32000/mongodb_service:registry
+        ports:
+        - containerPort: 8000
