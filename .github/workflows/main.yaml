@@ -1,5 +1,8 @@
 name: hello-world
 on: [push, pull_request]
+defaults:
+ run:
+  working-directory: ./lab12
 jobs:
   test:
     strategy:
@@ -15,24 +18,5 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v2
     - name: Test
-      working-directory: ./lab12
       run: go test ./microservice
-  docker:
-    needs: test
-    runs-on: ubuntu-latest
-    steps:
-    - name: Login to DockerHub
-      uses: docker/login-action@v1 
-      with:
-        username: ${{ secrets.DOCKER_USERNAME }}
-        password: ${{ secrets.DOCKER_PASSWORD }}
-    - name: Build and push
-      id: docker_build
-      uses: docker/build-push-action@v2
-      with:
-        file: ./lab12/dockerfile
-        push: true
-        tags: leeinfy98/helloserver:latest
-    - name: Image digest
-      run: echo ${{ steps.docker_build.outputs.digest }}
 
