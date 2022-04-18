@@ -32,9 +32,8 @@ jobs:
       id: docker_build
       uses: docker/build-push-action@v2
       with:
-        context: ./lab12/
+        context: ./CloudNative/1ab12
         push: true
-        file: ./lab12/dockerfile
         tags: leeinfy98/helloserver:latest
     - name: Image digest
       run: echo ${{ steps.docker_build.outputs.digest }}
