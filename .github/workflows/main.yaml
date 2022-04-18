@@ -30,9 +30,9 @@ jobs:
         password: ${{ secrets.DOCKER_PASSWORD }}
     - name: Build and push
       id: docker_build
-      context: ./lab12
       uses: docker/build-push-action@v2
       with:
+        path: ./lab12-
         push: true
         tags: leeinfy98/helloserver:latest
     - name: Image digest

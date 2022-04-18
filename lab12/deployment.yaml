@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: lab12-web-deployment
+  labels:
+    app: lab12-web
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: lab12-web
+  template:
+    metadata:
+      labels:
+        app: lab12-web
+    spec:
+      containers:
+      - name: webserver-container
+        image: leeinfy98/helloserver:public
+        ports:
+        - containerPort: 8000
