@@ -30,7 +30,7 @@ jobs:
         password: ${{ secrets.DOCKER_PASSWORD }}
     - name: Build and push
       id: docker_build
-      file: ./lab12/dockerfile
+      file: ./lab12/dockerfile/
       uses: docker/build-push-action@v2
       with:
         push: true
