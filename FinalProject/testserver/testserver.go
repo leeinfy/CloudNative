@@ -1,7 +1,7 @@
 package main
 
 import (
-	"FinalProject/stockapi"
+	"CloudNative/FinalProject/stockapi"
 	"context"
 	"log"
 	"net"
@@ -14,11 +14,11 @@ const (
 )
 
 type server struct {
-	stockapi.UnimplementedStockPerdictionServer
+	stockapi.UnimplementedStockPredictionServer
 }
 
 //a simple getstock grpc server
-func (s *server) GetStock(ctx context.Context, in *stockapi.APIRequest) (*stockapi.APIReturn, err) {
+func (s *server) GetStock(ctx context.Context, in *stockapi.APIRequest) (*stockapi.APIReturn, error) {
 	name := in.GetName()
 	date := in.GetDate()
 	log.Printf("Received{Name: %s, Date: %s", name, date)
@@ -40,6 +40,7 @@ func main() {
 		log.Fatalf("fialt to listen: %v", err)
 	}
 	s := grpc.NewServer()
+	stockapi.RegisterStockPredictionServer(s, &server{})
 	if err := s.Serve(lis); err != nil {
 		log.Fatalf("failed to serve: %v", err)
 	}

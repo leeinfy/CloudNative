@@ -1,15 +1,17 @@
 package main
 
 import (
+	"CloudNative/FinalProject/stockapi"
+	"context"
 	"fmt"
 	"log"
-	"math/rand"
 	"net/http"
 	"time"
 
 	"github.com/go-echarts/go-echarts/v2/charts"
 	"github.com/go-echarts/go-echarts/v2/opts"
 	"github.com/go-echarts/go-echarts/v2/types"
+	"google.golang.org/grpc"
 )
 
 const (
@@ -20,13 +22,7 @@ const (
 //var MLengineClient stockapi.StockPerdictionClient
 
 func main() {
-	// Set up a connection to the server.
-	/*conn, err := grpc.Dial(MLenginePort, grpc.WithInsecure(), grpc.WithBlock())
-	if err != nil {
-		log.Fatalf("Fail to connect to MLengine: %v", err)
-	}
-	defer conn.Close()
-	MLengineClient = stockapi.NewStockPerdictionClient(conn)*/
+
 	//set up http server mux
 	mux := http.NewServeMux()
 	mux.Handle("/", http.HandlerFunc(info))
@@ -36,11 +32,11 @@ func main() {
 	log.Fatal(http.ListenAndServe(serverPort, mux))
 }
 
-// generate random data for line chart
-func generateLineItems() []opts.LineData {
+// generate data for line chart
+func generateLineItems(v []float32) []opts.LineData {
 	items := make([]opts.LineData, 0)
 	for i := 0; i < 50; i++ {
-		items = append(items, opts.LineData{Value: rand.Intn(300)})
+		items = append(items, opts.LineData{Value: v[i]})
 	}
 	return items
 }
@@ -52,9 +48,31 @@ func info(w http.ResponseWriter, req *http.Request) {
 func request(w http.ResponseWriter, req *http.Request) {
 	// get name from url
 	stockName := req.URL.Query().Get("name")
+	log.Println("receive request from client ", stockName)
+	// Set up a connection to the server.
+	log.Println("make connection to ML Engine...")
+	conn, err := grpc.Dial(MLenginePort, grpc.WithInsecure(), grpc.WithBlock())
+	if err != nil {
+		log.Fatalf("Fail to connect to ML Engine: ", err)
+	}
+	defer conn.Close()
+	c := stockapi.NewStockPredictionClient(conn)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	defer cancel()
 	// get current time
 	currentTime := time.Now()
-	//date := fmt.Sprintf("%v-%v-%v", currentTime.Year(), int(currentTime.Month()), currentTime.Day())
+	date := fmt.Sprintf("%v-%v-%v", currentTime.Year(), int(currentTime.Month()), currentTime.Day())
+	log.Println("Send request from ML Engine .....")
+	r, err := c.GetStock(ctx, &stockapi.APIRequest{Name: stockName, Date: date})
+	if err != nil {
+		log.Println(err)
+		return
+	}
+	if r.Status != "" {
+		fmt.Fprintln(w, r.Status)
+		return
+	}
+	log.Println("Plot the chart and show the result....")
 	// create a new line instance
 	line := charts.NewLine()
 	// set some global options like Title/Legend/ToolTip or anything else
@@ -74,8 +92,10 @@ func request(w http.ResponseWriter, req *http.Request) {
 		XAxis = append(XAxis, fmt.Sprintf("%v-%v", month, day))
 	}
 	line.SetXAxis(XAxis).
-		AddSeries(stockName, generateLineItems()).
-		SetSeriesOptions(charts.WithLineChartOpts(opts.LineChart{Smooth: true}))
+		AddSeries(stockName, generateLineItems(r.Data)).
+		SetSeriesOptions(charts.WithLineChartOpts(opts.LineChart{Smooth: false}))
 	line.Render(w)
-	fmt.Fprintf(w, "Our Machine Learning Engine recommandation: \n")
+	fmt.Fprintf(w, "Prediction of stock value: $%v, ", r.Prediction)
+	fmt.Fprintf(w, "Our Machine Learning Engine recommandation: %s", r.Recomandation)
+	log.Println("request finished....")
 }

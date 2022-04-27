@@ -18,86 +18,86 @@ import (
 // Requires gRPC-Go v1.32.0 or later.
 const _ = grpc.SupportPackageIsVersion7
 
-// StockPerdictionClient is the client API for StockPerdiction service.
+// StockPredictionClient is the client API for StockPrediction service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
-type StockPerdictionClient interface {
+type StockPredictionClient interface {
 	GetStock(ctx context.Context, in *APIRequest, opts ...grpc.CallOption) (*APIReturn, error)
 }
 
-type stockPerdictionClient struct {
+type stockPredictionClient struct {
 	cc grpc.ClientConnInterface
 }
 
-func NewStockPerdictionClient(cc grpc.ClientConnInterface) StockPerdictionClient {
-	return &stockPerdictionClient{cc}
+func NewStockPredictionClient(cc grpc.ClientConnInterface) StockPredictionClient {
+	return &stockPredictionClient{cc}
 }
 
-func (c *stockPerdictionClient) GetStock(ctx context.Context, in *APIRequest, opts ...grpc.CallOption) (*APIReturn, error) {
+func (c *stockPredictionClient) GetStock(ctx context.Context, in *APIRequest, opts ...grpc.CallOption) (*APIReturn, error) {
 	out := new(APIReturn)
-	err := c.cc.Invoke(ctx, "/stockapi.StockPerdiction/getStock", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/stockapi.StockPrediction/getStock", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-// StockPerdictionServer is the server API for StockPerdiction service.
-// All implementations must embed UnimplementedStockPerdictionServer
+// StockPredictionServer is the server API for StockPrediction service.
+// All implementations must embed UnimplementedStockPredictionServer
 // for forward compatibility
-type StockPerdictionServer interface {
+type StockPredictionServer interface {
 	GetStock(context.Context, *APIRequest) (*APIReturn, error)
-	mustEmbedUnimplementedStockPerdictionServer()
+	mustEmbedUnimplementedStockPredictionServer()
 }
 
-// UnimplementedStockPerdictionServer must be embedded to have forward compatible implementations.
-type UnimplementedStockPerdictionServer struct {
+// UnimplementedStockPredictionServer must be embedded to have forward compatible implementations.
+type UnimplementedStockPredictionServer struct {
 }
 
-func (UnimplementedStockPerdictionServer) GetStock(context.Context, *APIRequest) (*APIReturn, error) {
+func (UnimplementedStockPredictionServer) GetStock(context.Context, *APIRequest) (*APIReturn, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetStock not implemented")
 }
-func (UnimplementedStockPerdictionServer) mustEmbedUnimplementedStockPerdictionServer() {}
+func (UnimplementedStockPredictionServer) mustEmbedUnimplementedStockPredictionServer() {}
 
-// UnsafeStockPerdictionServer may be embedded to opt out of forward compatibility for this service.
-// Use of this interface is not recommended, as added methods to StockPerdictionServer will
+// UnsafeStockPredictionServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to StockPredictionServer will
 // result in compilation errors.
-type UnsafeStockPerdictionServer interface {
-	mustEmbedUnimplementedStockPerdictionServer()
+type UnsafeStockPredictionServer interface {
+	mustEmbedUnimplementedStockPredictionServer()
 }
 
-func RegisterStockPerdictionServer(s grpc.ServiceRegistrar, srv StockPerdictionServer) {
-	s.RegisterService(&StockPerdiction_ServiceDesc, srv)
+func RegisterStockPredictionServer(s grpc.ServiceRegistrar, srv StockPredictionServer) {
+	s.RegisterService(&StockPrediction_ServiceDesc, srv)
 }
 
-func _StockPerdiction_GetStock_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _StockPrediction_GetStock_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(APIRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(StockPerdictionServer).GetStock(ctx, in)
+		return srv.(StockPredictionServer).GetStock(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/stockapi.StockPerdiction/getStock",
+		FullMethod: "/stockapi.StockPrediction/getStock",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(StockPerdictionServer).GetStock(ctx, req.(*APIRequest))
+		return srv.(StockPredictionServer).GetStock(ctx, req.(*APIRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-// StockPerdiction_ServiceDesc is the grpc.ServiceDesc for StockPerdiction service.
+// StockPrediction_ServiceDesc is the grpc.ServiceDesc for StockPrediction service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
-var StockPerdiction_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "stockapi.StockPerdiction",
-	HandlerType: (*StockPerdictionServer)(nil),
+var StockPrediction_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "stockapi.StockPrediction",
+	HandlerType: (*StockPredictionServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
 			MethodName: "getStock",
-			Handler:    _StockPerdiction_GetStock_Handler,
+			Handler:    _StockPrediction_GetStock_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
