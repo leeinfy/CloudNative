@@ -8,10 +8,12 @@ service StockPerdiction{
 
 message APIRequest{
 	string name = 1;
-	string data = 2;
+	string date = 2;
 }
 
 message APIReturn{
 	repeated float data = 1;
-	string forcast = 2;
+	float prediction = 2;
+	string recomandation = 3;
+	string status = 4;
 }
