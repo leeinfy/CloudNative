@@ -22,7 +22,6 @@ const (
 //var MLengineClient stockapi.StockPerdictionClient
 
 func main() {
-
 	//set up http server mux
 	mux := http.NewServeMux()
 	mux.Handle("/", http.HandlerFunc(info))
@@ -41,6 +40,7 @@ func generateLineItems(v []float32) []opts.LineData {
 	return items
 }
 
+// guide reference page
 func info(w http.ResponseWriter, req *http.Request) {
 
 }
@@ -49,7 +49,8 @@ func request(w http.ResponseWriter, req *http.Request) {
 	// get name from url
 	stockName := req.URL.Query().Get("name")
 	log.Println("receive request from client ", stockName)
-	// Set up a connection to the server.
+
+	// Set up a connection to ML engine server.
 	log.Println("make connection to ML Engine...")
 	conn, err := grpc.Dial(MLenginePort, grpc.WithInsecure(), grpc.WithBlock())
 	if err != nil {
@@ -59,9 +60,12 @@ func request(w http.ResponseWriter, req *http.Request) {
 	c := stockapi.NewStockPredictionClient(conn)
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
+
 	// get current time
 	currentTime := time.Now()
 	date := fmt.Sprintf("%v-%v-%v", currentTime.Year(), int(currentTime.Month()), currentTime.Day())
+
+	//send a request to ML engine
 	log.Println("Send request from ML Engine .....")
 	r, err := c.GetStock(ctx, &stockapi.APIRequest{Name: stockName, Date: date})
 	if err != nil {
@@ -73,6 +77,7 @@ func request(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 	log.Println("Plot the chart and show the result....")
+
 	// create a new line instance
 	line := charts.NewLine()
 	// set some global options like Title/Legend/ToolTip or anything else
