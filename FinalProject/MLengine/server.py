@@ -14,9 +14,9 @@ class Listener(stockapi_pb2_grpc.StockPredictionServicer):
         date = request.date
         print(date)
         data = []
-        for i in range(0,50):
-            data[i] = float(i)
-        result = {'data': data, 'rediction': 20, 'recomandation': "buy", 'status': ""}
+        for i in range(50):
+            data.append(float(i))
+        result = {'data': data, 'prediction': 20, 'recomandation': "buy", 'status': ""}
         return stockapi_pb2.APIReturn(**result)
 
 def serve():
