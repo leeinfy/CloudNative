@@ -4,6 +4,7 @@ import (
 	"CloudNative/FinalProject/stockapi"
 	"context"
 	"fmt"
+	"html/template"
 	"log"
 	"net/http"
 	"time"
@@ -18,8 +19,6 @@ const (
 	serverPort   = "localhost:50001"
 	MLenginePort = ":50002"
 )
-
-//var MLengineClient stockapi.StockPerdictionClient
 
 func main() {
 	//set up http server mux
@@ -42,12 +41,13 @@ func generateLineItems(v []float32) []opts.LineData {
 
 // guide reference page
 func info(w http.ResponseWriter, req *http.Request) {
-
+	tmpl := template.Must(template.ParseFiles("main.html"))
+	tmpl.ExecuteTemplate(w, "main.html", nil)
 }
 
 func request(w http.ResponseWriter, req *http.Request) {
 	// get name from url
-	stockName := req.URL.Query().Get("name")
+	stockName := req.FormValue("stockName")
 	log.Println("receive request from client ", stockName)
 
 	// Set up a connection to ML engine server.
