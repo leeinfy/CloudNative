@@ -33,7 +33,7 @@ func main() {
 // generate data for line chart
 func generateLineItems(v []float32) []opts.LineData {
 	items := make([]opts.LineData, 0)
-	for i := 0; i < 50; i++ {
+	for i := range v {
 		items = append(items, opts.LineData{Value: v[i]})
 	}
 	return items
@@ -58,7 +58,7 @@ func request(w http.ResponseWriter, req *http.Request) {
 	}
 	defer conn.Close()
 	c := stockapi.NewStockPredictionClient(conn)
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
 	// get current time
@@ -90,13 +90,7 @@ func request(w http.ResponseWriter, req *http.Request) {
 		}))
 
 	// Put data into instance
-	var XAxis []string
-	for i := -49; i <= 0; i++ {
-		month := currentTime.AddDate(0, 0, i).Month()
-		day := currentTime.AddDate(0, 0, i).Day()
-		XAxis = append(XAxis, fmt.Sprintf("%v-%v", month, day))
-	}
-	line.SetXAxis(XAxis).
+	line.SetXAxis(r.Date).
 		AddSeries(stockName, generateLineItems(r.Data)).
 		SetSeriesOptions(charts.WithLineChartOpts(opts.LineChart{Smooth: false}))
 	line.Render(w)

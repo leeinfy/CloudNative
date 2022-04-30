@@ -12,8 +12,9 @@ message APIRequest{
 }
 
 message APIReturn{
-	repeated float data = 1;
-	float prediction = 2;
-	string recomandation = 3;
-	string status = 4;
+	repeated string date = 1;
+	repeated float data = 2;
+	float prediction = 3;
+	string recomandation = 4;
+	string status = 5;
 }
