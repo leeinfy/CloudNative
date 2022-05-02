@@ -21,13 +21,16 @@ const (
 )
 
 func main() {
-	//set up http server mux
-	mux := http.NewServeMux()
-	mux.Handle("/", http.HandlerFunc(info))
-	mux.Handle("/stock", http.HandlerFunc(request))
+	server := http.Server{
+		Addr: serverPort,
+	}
+	http.HandleFunc("/", info)
+	http.HandleFunc("/stock", request)
+	http.Handle("/picture/", http.StripPrefix("/picture", http.FileServer(http.Dir("picture"))))
+	http.Handle("/css/", http.StripPrefix("/css", http.FileServer(http.Dir("css"))))
 	//set port to localhost:50001
 	log.Print("Setup Server......")
-	log.Fatal(http.ListenAndServe(serverPort, mux))
+	log.Fatal(server.ListenAndServe())
 }
 
 // generate data for line chart
@@ -95,6 +98,6 @@ func request(w http.ResponseWriter, req *http.Request) {
 		SetSeriesOptions(charts.WithLineChartOpts(opts.LineChart{Smooth: false}))
 	line.Render(w)
 	fmt.Fprintf(w, "Prediction of stock value: $%v, ", r.Prediction)
-	fmt.Fprintf(w, "Our Machine Learning Engine recommandation: %s", r.Recomandation)
+	fmt.Fprintf(w, "DAMUSS recommandation: %s", r.Recomandation)
 	log.Println("request finished....")
 }
